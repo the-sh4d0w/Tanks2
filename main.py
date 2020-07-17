@@ -27,7 +27,7 @@ class Game:
         self.invulnerable = False
         with open("config.json", "r") as f:
             self.config = json.load(f)
-        pygame.display.set_caption("Tanks")
+        pygame.display.set_caption("Tanks2")
         pygame.display.set_icon(pygame.image.load(
             f"images{os.sep}icon.png").convert_alpha())
 
