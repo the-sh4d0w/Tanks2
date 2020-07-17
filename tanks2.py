@@ -35,7 +35,7 @@ class Game:
         """Loads levels."""
         if not os.path.isfile(f"levels{os.sep}level_{self.level_number}.json"):
             self.level_number = 1
-            self.menu_screen()
+            self.credit_screen()
         with open(f"levels{os.sep}level_{self.level_number}.json", "r") as f:
             level = json.load(f)
         self.player_one = Player_Blue(
@@ -106,7 +106,7 @@ class Game:
                             pygame.quit()
                             quit()
             self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                 40).render("Tanks", False, (0, 0, 255)), (380, 70))
+                                                 40).render("Tanks 2", False, (0, 0, 255)), (360, 70))
             if start:
                 self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
                                                      20).render("Starten", False, (0, 0, 150)), (380, 150))
@@ -169,6 +169,33 @@ class Game:
             f"images{os.sep}Evil Panda Studios Logo.png").convert(), (self.WIDTH, self.HEIGHT)), (0, 0))
         pygame.display.update()
         pygame.time.wait(3000)
+        self.menu_screen()
+
+    def credit_screen(self) -> None:
+        """The credit screen. Shows who worked on the game."""
+        self.window.fill((0, 0, 0))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
+                                             20).render("Credits", False, (255, 255, 255)), (360, 50))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Spieledesigner         Niklas", False, (255, 255, 255)), (100, 100))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Programmierer        Benjamin", False, (255, 255, 255)), (100, 150))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Grafiker                  Benjamin", False, (255, 255, 255)), (100, 200))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Komponist              Benjamin", False, (255, 255, 255)), (100, 250))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Leveldesigner          Niklas", False, (255, 255, 255)), (100, 300))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Tester 1                 Niklas", False, (255, 255, 255)), (500, 100))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Tester 2                 Benjamin", False, (255, 255, 255)), (500, 150))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Sounddesigner       Benjamin", False, (255, 255, 255)), (500, 200))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Produzent              Benjamin", False, (255, 255, 255)), (500, 250))
+        pygame.display.update()
+        pygame.time.wait(7000)
         self.menu_screen()
 
 
