@@ -5,7 +5,7 @@
     ],
     "spawn_two": [
         760,
-        10
+        360
     ],
     "walls": [
         {
@@ -18,42 +18,7 @@
         {
             "type": "I_y",
             "position": [
-                690,
-                0
-            ]
-        },
-        {
-            "type": "I_x",
-            "position": [
                 100,
-                100
-            ]
-        },
-        {
-            "type": "I_y",
-            "position": [
-                200,
-                100
-            ]
-        },
-        {
-            "type": "I_y",
-            "position": [
-                290,
-                100
-            ]
-        },
-        {
-            "type": "I_x",
-            "position": [
-                300,
-                100
-            ]
-        },
-        {
-            "type": "I_x",
-            "position": [
-                400,
                 100
             ]
         },
@@ -61,6 +26,13 @@
             "type": "I_y",
             "position": [
                 500,
+                0
+            ]
+        },
+        {
+            "type": "I_x",
+            "position": [
+                410,
                 100
             ]
         },
@@ -68,7 +40,7 @@
             "type": "I_x",
             "position": [
                 0,
-                200
+                300
             ]
         },
         {
@@ -81,40 +53,40 @@
         {
             "type": "I_y",
             "position": [
-                100,
-                200
+                200,
+                210
             ]
         },
         {
             "type": "I_x",
+            "position": [
+                200,
+                200
+            ]
+        },
+        {
+            "type": "I_y",
+            "position": [
+                300,
+                110
+            ]
+        },
+        {
+            "type": "I_y",
+            "position": [
+                500,
+                210
+            ]
+        },
+        {
+            "type": "I_y",
             "position": [
                 300,
                 300
             ]
         },
         {
-            "type": "I_x",
-            "position": [
-                400,
-                300
-            ]
-        },
-        {
-            "type": "I_x",
-            "position": [
-                600,
-                300
-            ]
-        },
-        {
             "type": "I_y",
-            "position": [
-                690,
-                200
-            ]
-        },
-        {
-            "type": "I_x",
             "position": [
                 700,
                 200
@@ -123,14 +95,42 @@
         {
             "type": "I_y",
             "position": [
-                590,
-                100
+                700,
+                300
+            ]
+        },
+        {
+            "type": "I_y",
+            "position": [
+                600,
+                110
+            ]
+        },
+        {
+            "type": "I_x",
+            "position": [
+                310,
+                300
+            ]
+        },
+        {
+            "type": "I_x",
+            "position": [
+                500,
+                200
             ]
         },
         {
             "type": "I_x",
             "position": [
                 600,
+                100
+            ]
+        },
+        {
+            "type": "I_x",
+            "position": [
+                700,
                 100
             ]
         }

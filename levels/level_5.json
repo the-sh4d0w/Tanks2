@@ -5,56 +5,28 @@
     ],
     "spawn_two": [
         760,
-        10
+        360
     ],
     "walls": [
         {
             "type": "I_y",
             "position": [
-                100,
-                0
-            ]
-        },
-        {
-            "type": "I_y",
-            "position": [
-                690,
-                0
-            ]
-        },
-        {
-            "type": "I_x",
-            "position": [
-                100,
+                190,
                 100
             ]
         },
         {
             "type": "I_y",
-            "position": [
-                200,
-                100
-            ]
-        },
-        {
-            "type": "I_y",
-            "position": [
-                290,
-                100
-            ]
-        },
-        {
-            "type": "I_x",
             "position": [
                 300,
                 100
             ]
         },
         {
-            "type": "I_x",
+            "type": "I_y",
             "position": [
-                400,
-                100
+                300,
+                200
             ]
         },
         {
@@ -62,6 +34,20 @@
             "position": [
                 500,
                 100
+            ]
+        },
+        {
+            "type": "I_y",
+            "position": [
+                500,
+                200
+            ]
+        },
+        {
+            "type": "I_y",
+            "position": [
+                590,
+                200
             ]
         },
         {
@@ -75,13 +61,6 @@
             "type": "I_x",
             "position": [
                 100,
-                300
-            ]
-        },
-        {
-            "type": "I_y",
-            "position": [
-                100,
                 200
             ]
         },
@@ -96,20 +75,13 @@
             "type": "I_x",
             "position": [
                 400,
-                300
+                100
             ]
         },
         {
             "type": "I_x",
             "position": [
                 600,
-                300
-            ]
-        },
-        {
-            "type": "I_y",
-            "position": [
-                690,
                 200
             ]
         },
@@ -118,20 +90,6 @@
             "position": [
                 700,
                 200
-            ]
-        },
-        {
-            "type": "I_y",
-            "position": [
-                590,
-                100
-            ]
-        },
-        {
-            "type": "I_x",
-            "position": [
-                600,
-                100
             ]
         }
     ]
