@@ -193,7 +193,10 @@ class Game:
         self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
             "Sounddesigner       Benjamin", False, (255, 255, 255)), (500, 200))
         self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
-            "Produzent              Benjamin", False, (255, 255, 255)), (500, 250))
+            "Produzent 1            Benjamin", False, (255, 255, 255)), (500, 250))
+        self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+            "Produzent 2            Niklas", False, (255, 255, 255)), (500, 300))
+
         pygame.display.update()
         pygame.time.wait(7000)
         self.menu_screen()
