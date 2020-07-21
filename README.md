@@ -2,7 +2,7 @@
 The sequel to Tanks. A two player duel tanks game.
 
 # Installation
-PyGame mit Version 2.0.0.dev06 wird benötigt. Installierbar mit ```pip install pygame==2.0.0.dev06```.
+PyGame wird benötigt. Installierbar mit ```pip install pygame```.
 
 # Anleitung
 [W] / [↑] Vorwärts bewegen
