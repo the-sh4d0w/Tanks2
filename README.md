@@ -6,9 +6,13 @@ PyGame mit Version 2.0.0.dev06 wird benötigt. Installierbar mit ```pip install 
 
 # Anleitung
 [W] / [↑] Vorwärts bewegen
+
 [A] / [↓] Rückwärts bewegen
+
 [S] / [→] Nach rechts bewegen
+
 [D] / [←] Nach links bewegen
+
 [F] / [L] Feuern
 
 # Einstellungen
