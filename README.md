@@ -1,8 +1,11 @@
 # Tanks2
 The sequel to Tanks. A two player duel tanks game.
+Der Nachfolger von Tanks. Ein Duell-Panzerspiel für zwei Spieler.
 
 # Installation
-PyGame wird benötigt. Installierbar mit ```pip install pygame```.
+Einfach das Repository klonen oder herunterladen.
+[Python](https://www.python.org) wird zu Ausführung gebraucht.
+Zudem wird PyGame benötigt. Installierbar mit ```pip install pygame```.
 
 # Anleitung
 [W] / [↑] Vorwärts bewegen
