@@ -1,0 +1,54 @@
+{
+    "spawn_one": [
+        10,
+        10
+    ],
+    "spawn_two": [
+        755,
+        355
+    ],
+    "walls": [
+        {
+            "type": "I_x",
+            "position": [
+                0,
+                100
+            ]
+        },
+        {
+            "type": "I_y",
+            "position": [
+                400,
+                0
+            ]
+        },
+        {
+            "type": "I_x",
+            "position": [
+                310,
+                100
+            ]
+        },
+        {
+            "type": "I_y",
+            "position": [
+                400,
+                300
+            ]
+        },
+        {
+            "type": "I_x",
+            "position": [
+                400,
+                290
+            ]
+        },
+        {
+            "type": "I_x",
+            "position": [
+                700,
+                290
+            ]
+        }
+    ]
+}
