@@ -9,7 +9,11 @@ class Game:
     """The game class."""
 
     def __init__(self) -> None:
-        """Initializes the game."""
+        """Initializes the game.
+
+        Returns:
+            Nothing.
+        """
         pygame.init()
         self.WIDTH = 800
         self.HEIGHT = 400
@@ -32,7 +36,11 @@ class Game:
             f"images{os.sep}icon.png").convert_alpha())
 
     def load_level(self) -> None:
-        """Loads levels."""
+        """Loads levels.
+
+        Returns:
+            Nothing.
+        """
         if not os.path.isfile(f"levels{os.sep}level_{self.level_number}.json"):
             self.level_number = 1
             self.credit_screen()
@@ -53,7 +61,11 @@ class Game:
             self.walls.append(wall_)
 
     def game_loop(self) -> None:
-        """The main loop of the game."""
+        """The main loop of the game.
+
+        Returns:
+            Nothing.
+        """
         self.load_level()
         dead = False
         pygame.mixer.music.load(f"sound{os.sep}background_song.wav")
@@ -83,7 +95,11 @@ class Game:
             self.clock.tick(self.config["fps"])
 
     def menu_screen(self) -> None:
-        """The menu screen. Allows either starting the game or quitting it."""
+        """The menu screen. Allows either starting the game or quitting it.
+
+        Returns:
+            Nothing.
+        """
         menu = True
         start = True
         pygame.mixer.music.load(f"sound{os.sep}menu_song.wav")
@@ -123,7 +139,14 @@ class Game:
         self.game_loop()
 
     def result_screen(self, player: int) -> None:
-        """The result screen. Shows who has won."""
+        """The result screen. Shows who has won.
+
+        Arguments:
+            player: the number of the player.
+
+        Returns:
+            Nothing.
+        """
         self.level_number += 1
         winner = True
         ok = True
@@ -164,7 +187,11 @@ class Game:
         self.game_loop()
 
     def splash_screen(self) -> None:
-        """The splash screen. Shows the game studio logo."""
+        """The splash screen. Shows the game studio logo.
+
+        Returns:
+            Nothing.
+        """
         self.window.blit(pygame.transform.smoothscale(pygame.image.load(
             f"images{os.sep}Evil Panda Studios Logo.png").convert(), (self.WIDTH, self.HEIGHT)), (0, 0))
         pygame.display.update()
@@ -172,7 +199,11 @@ class Game:
         self.menu_screen()
 
     def credit_screen(self) -> None:
-        """The credit screen. Shows who worked on the game."""
+        """The credit screen. Shows who worked on the game.
+
+        Returns:
+            Nothing.
+        """
         self.window.fill((0, 0, 0))
         self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
                                              20).render("Credits", False, (255, 255, 255)), (360, 50))
@@ -206,7 +237,18 @@ class Player(pygame.sprite.Sprite):
     """The player base class."""
 
     def __init__(self, x: int, y: int, speed: int, firerate: int, images: list) -> None:
-        """Initializes the player."""
+        """Initializes the player.
+
+        Arguments:
+            x: the x coordinate.
+            y: the y coordinate.
+            speed: the speed of the player.
+            firerate: the firerate of the player.
+            images: the images needed to draw the player.
+
+        Returns:
+            Nothing.
+        """
         pygame.sprite.Sprite.__init__(self)
         self.images = images
         self.rect = self.images[0].get_rect()
@@ -218,7 +260,20 @@ class Player(pygame.sprite.Sprite):
         self.fire = 0
 
     def move(self, entities: list, HEIGHT: int, WIDTH: int, left: int, right: int, up: int, down: int) -> None:
-        """Moves the player based on user input."""
+        """Moves the player based on user input.
+
+        Arguments:
+            entities: the other entitites in the game.
+            HEIGHT: the height of the game window.
+            WIDTH: the width of the game window.
+            left: the id of the key for left movement.
+            right: the id of the key for right movement.
+            up: the id of the key for up movement.
+            down: the id of the key for down movement.
+
+        Returns:
+            Nothing.
+        """
         keys = pygame.key.get_pressed()
         if keys[up]:
             self.direction = 0
@@ -242,7 +297,15 @@ class Player(pygame.sprite.Sprite):
                 self.rect.x -= self.speed
 
     def attack(self, bullets: list, fire: int) -> None:
-        """Shoots bullets based on user input."""
+        """Shoots bullets based on user input.
+
+        Arguments:
+            bullets: all bullets in the game.
+            fire: counts down to regulate firerate.
+
+        Returns:
+            Nothing.
+        """
         keys = pygame.key.get_pressed()
         if keys[fire]:
             if self.fire == 0:
@@ -255,7 +318,14 @@ class Player(pygame.sprite.Sprite):
             self.fire = 0
 
     def update(self, window: pygame.Surface) -> None:
-        """Draws the player on the screen."""
+        """Draws the player on the screen.
+
+        Arguments:
+            window: the game window.
+
+        Returns:
+            Nothing.
+        """
         window.blit(self.images[self.direction], (self.rect.x, self.rect.y))
 
 
@@ -263,16 +333,42 @@ class Player_Blue(Player):
     """Class for the blue player. Inherits from the player class."""
 
     def __init__(self, x: int, y: int, speed: int, firerate: int) -> None:
-        """Initializes the blue player. Calls the inherited function."""
+        """Initializes the blue player. Calls the inherited function.
+
+        Arguments:
+            x: the x coordinate.
+            y: the y coordinate.
+            speed: the speed of the player.
+            firerate: the firerate of the player.
+
+        Returns:
+            Nothing.
+        """
         super().__init__(x, y, speed, firerate, [pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_up.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_left.png").convert_alpha(
         ), pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_down.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_right.png").convert_alpha()])
 
     def move(self, entities: list, HEIGHT: int, WIDTH: int) -> None:
-        """Moves the blue player based on user input. Calls the inherited function."""
+        """Moves the blue player based on user input. Calls the inherited function.
+
+        Arguments:
+            entities: all the entities in the game.
+            HEIGHT: the height of the game window.
+            WIDTH: the width of the game window.
+
+        Returns:
+            Nothing.
+        """
         super().move(entities, HEIGHT, WIDTH, ord("a"), ord("d"), ord("w"), ord("s"))
 
     def attack(self, bullets: list) -> None:
-        """Shoots bullets based on user input. Calls the inherited function."""
+        """Shoots bullets based on user input. Calls the inherited function.
+
+        Arguments:
+            bulles: a list of all bullets in the game.
+
+        Returns:
+            Nothing.
+        """
         return super().attack(bullets, ord("f"))
 
 
@@ -280,17 +376,43 @@ class Player_Yellow(Player):
     """Class for the yellow player. Inherits from the player class."""
 
     def __init__(self, x: int, y: int, speed: int, firerate: int) -> None:
-        """Initializes the yellow player. Calls the inherited function."""
+        """Initializes the yellow player. Calls the inherited function.
+
+        Arguments:
+            x: the x coordinate.
+            y: the y coordinate.
+            speed: the speed of the player.
+            firerate: the firerate of the player.
+
+        Returns:
+            Nothing.
+        """
         super().__init__(x, y, speed, firerate, [pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_up.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_left.png").convert_alpha(
         ), pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_down.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_right.png").convert_alpha()])
 
     def move(self, entities: list, HEIGHT: int, WIDTH: int) -> None:
-        """Moves the yellow player based on user input. Calls the inherited function."""
+        """Moves the yellow player based on user input. Calls the inherited function.
+
+        Arguments:
+            entities: all the entities in the game.
+            HEIGHT: the height of the game window.
+            WIDTH: the width of the game window.
+
+        Returns:
+            Nothing.
+        """
         super().move(entities, HEIGHT, WIDTH, pygame.K_LEFT,
                      pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
 
     def attack(self, bullets: list) -> None:
-        """Shoots bullets based on user input. Calls the inherited function."""
+        """Shoots bullets based on user input. Calls the inherited function.
+
+        Arguments:
+            bulles: a list of all bullets in the game.
+
+        Returns:
+            Nothing.
+        """
         return super().attack(bullets, ord("l"))
 
 
@@ -298,7 +420,17 @@ class Bullet(pygame.sprite.Sprite):
     """Class for the bullet."""
 
     def __init__(self, x: int, y: int, speed: int, direction: int) -> None:
-        """Initializes the bullet."""
+        """Initializes the bullet.
+
+        Arguments:
+            x: the x coordinate.
+            y: the y coordinate.
+            speed: the speed of the bullet.
+            direction: the direction the bullet is facing.
+
+        Returns:
+            Nothing.
+        """
         pygame.sprite.Sprite.__init__(self)
         images = {
             0: pygame.image.load(f"images{os.sep}bullet{os.sep}bullet_y.png").convert(),
@@ -327,7 +459,20 @@ class Bullet(pygame.sprite.Sprite):
         pygame.mixer.Sound(f"sound{os.sep}shot_sound.wav").play()
 
     def move(self, bullets: list, walls: list, player_one: Player_Blue, player_two: Player_Yellow, HEIGHT: int, WIDTH: int, window: pygame.Surface) -> typing.Union[None, int]:
-        """Moves the bullet."""
+        """Moves the bullet.
+
+        Arguments:
+            bullets: all bullets in the game.
+            walls: all the walls in the game.
+            player_one: the first player.
+            player_two: the second player.
+            HEIGHT: the height of the game window.
+            WIDTH: the width of the game window.
+            window: the game window.
+
+        Returns:
+            Nothing or the number of the player that was hit.
+        """
         if self.direction == 0:
             self.rect.y -= self.speed
         elif self.direction == 1:
@@ -353,7 +498,14 @@ class Bullet(pygame.sprite.Sprite):
             return 1
 
     def update(self, window: pygame.Surface) -> None:
-        """Draws the bullet on the screen."""
+        """Draws the bullet on the screen.
+
+        Arguments:
+            window: the game window.
+
+        Returns:
+            Nothing or the number of the player that was hit.
+        """
         window.blit(self.image, (self.rect.x, self.rect.y))
 
 
@@ -361,7 +513,16 @@ class Wall(pygame.sprite.Sprite):
     """Class for the wall."""
 
     def __init__(self, x: int, y: int, type_: str) -> None:
-        """Initializes the wall."""
+        """Initializes the wall.
+
+        Arguments:
+            x: the x coordinate.
+            x: the y coordinate.
+            type_: the type of wall.
+
+        Returns:
+            Nothing.
+        """
         pygame.sprite.Sprite.__init__(self)
         images = {
             "I_x": pygame.image.load(f"images{os.sep}wall{os.sep}wall_I_x.png").convert(),
@@ -373,7 +534,14 @@ class Wall(pygame.sprite.Sprite):
         self.rect.y = y
 
     def update(self, window: pygame.Surface) -> None:
-        """Draws the wall on the screen."""
+        """Draws the wall on the screen.
+
+        Arguments:
+            window: the game window.
+
+        Returns:
+            Nothing.
+        """
         window.blit(self.image, (self.rect.x, self.rect.y))
 
 
