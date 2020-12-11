@@ -29,6 +29,9 @@ class Game:
         self.level_number = 1
         self.debug = False
         self.invulnerable = False
+        self.debug = False
+        self.color_one = "blue"
+        self.color_two = "yellow"
         with open("config.json", "r") as f:
             self.config = json.load(f)
         pygame.display.set_caption("Tanks2")
@@ -46,10 +49,10 @@ class Game:
             self.credit_screen()
         with open(f"levels{os.sep}level_{self.level_number}.json", "r") as f:
             level = json.load(f)
-        self.player_one = Player_Blue(
-            level["spawn_one"][0], level["spawn_one"][1], self.config["speed"], self.config["firerate"])
-        self.player_two = Player_Yellow(
-            level["spawn_two"][0], level["spawn_two"][1], self.config["speed"], self.config["firerate"])
+        self.player_one = Player_One(level["spawn_one"][0], level["spawn_one"]
+                                     [1], self.config["speed"], self.config["firerate"], self.color_one)
+        self.player_two = Player_Two(level["spawn_two"][0], level["spawn_two"]
+                                     [1], self.config["speed"], self.config["firerate"], self.color_two)
         self.entities = []
         self.walls = []
         self.bullets = []
@@ -76,6 +79,17 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
+                elif event.type == pygame.KEYDOWN:
+                    pass
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_F3]:
+                self.debug = not self.debug
+            elif keys[pygame.K_F2]:
+                self.result_screen(2)
+            elif keys[pygame.K_F1]:
+                self.result_screen(1)
+            elif keys[pygame.K_ESCAPE]:
+                self.menu_screen()
             self.entities = [self.player_one, self.player_two] + self.walls
             self.player_one.move(self.entities, self.HEIGHT, self.WIDTH)
             self.player_one.attack(self.bullets)
@@ -91,6 +105,21 @@ class Game:
                     self.result_screen(dead)
             for wall in self.walls:
                 wall.update(self.window)
+            if self.debug:
+                self.window.blit(pygame.font.SysFont(
+                    "Arial, Helvetica, sans-serif", 20).render("Debug", False, (255, 255, 255)), (10, 10))
+                self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+                    f"FPS: {round(self.clock.get_fps())}", False, (255, 255, 255)), (10, 30))
+                pygame.draw.rect(self.window, (0, 255, 0), pygame.Rect(
+                    self.player_one.rect.x, self.player_one.rect.y, self.player_one.rect.width, self.player_one.rect.height), 1)
+                pygame.draw.rect(self.window, (0, 255, 0), pygame.Rect(
+                    self.player_two.rect.x, self.player_two.rect.y, self.player_two.rect.width, self.player_two.rect.height), 1)
+                for wall in self.walls:
+                    pygame.draw.rect(self.window, (255, 0, 0), pygame.Rect(
+                        wall.rect.x, wall.rect.y, wall.rect.width, wall.rect.height), 1)
+                for bullet in self.bullets:
+                    pygame.draw.rect(self.window, (0, 0, 255), pygame.Rect(
+                        bullet.rect.x, bullet.rect.y, bullet.rect.width, bullet.rect.height), 1)
             pygame.display.update()
             self.clock.tick(self.config["fps"])
 
@@ -100,8 +129,10 @@ class Game:
         Returns:
             Nothing.
         """
+        text = [["Start", (380, 150)], ["Farbwahl", (380, 200)], [
+            "Beenden", (380, 250)]]
         menu = True
-        start = True
+        selected = 0
         pygame.mixer.music.load(f"sound{os.sep}menu_song.wav")
         pygame.mixer.music.play(-1)
         while menu:
@@ -112,31 +143,116 @@ class Game:
                     quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        start = not start
+                        selected -= 1
                     elif event.key == pygame.K_DOWN:
-                        start = not start
+                        selected += 1
                     elif event.key == pygame.K_RETURN:
-                        if start:
+                        if selected == 0:
                             menu = False
-                        else:
+                        elif selected == 1:
+                            self.options_screen()
+                        elif selected == 2:
                             pygame.quit()
                             quit()
-            self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                 40).render("Tanks 2", False, (0, 0, 255)), (360, 70))
-            if start:
-                self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                     20).render("Starten", False, (0, 0, 150)), (380, 150))
-                self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                     20).render("Beenden", False, (0, 0, 0)), (380, 200))
-            else:
-                self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                     20).render("Starten", False, (0, 0, 0)), (380, 150))
-                self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                     20).render("Beenden", False, (0, 0, 150)), (380, 200))
+                    if selected > 2:
+                        selected = 0
+                    elif selected < 0:
+                        selected = 2
+            self.window.blit(pygame.font.SysFont(
+                "Arial, Helvetica, sans-serif", 40).render("Tanks 2", False, (0, 0, 255)), (360, 70))
+            for i in range(0, 3):
+                if i != selected:
+                    color = (0, 0, 0)
+                else:
+                    color = (0, 0, 255)
+                self.window.blit(pygame.font.SysFont(
+                    "Arial, Helvetica, sans-serif", 20).render(text[i][0], False, color), text[i][1])
             pygame.display.update()
             self.clock.tick(60)
         pygame.mixer.music.stop()
         self.game_loop()
+
+    def options_screen(self) -> None:
+        """The options screen. Lets players choose their color.
+
+        Returns:
+            Nothing.
+        """
+        colors = ["blue", "yellow", "green", "red"]
+        options = True
+        color_one = 0
+        color_two = 1
+        while options:
+            self.window.fill((190, 190, 190))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        options = False
+                    if event.key == pygame.K_a:
+                        color_one -= 1
+                        if color_one < 0:
+                            color_one = 3
+                        elif color_one > 3:
+                            color_one = 0
+                        if color_one == color_two:
+                            color_one -= 1
+                        if color_one < 0:
+                            color_one = 3
+                        elif color_one > 3:
+                            color_one = 0
+                    elif event.key == pygame.K_d:
+                        color_one += 1
+                        if color_one < 0:
+                            color_one = 3
+                        elif color_one > 3:
+                            color_one = 0
+                        if color_one == color_two:
+                            color_one += 1
+                        if color_one < 0:
+                            color_one = 3
+                        elif color_one > 3:
+                            color_one = 0
+                    if event.key == pygame.K_LEFT:
+                        color_two -= 1
+                        if color_two < 0:
+                            color_two = 3
+                        elif color_two > 3:
+                            color_two = 0
+                        if color_two == color_one:
+                            color_two -= 1
+                        if color_two < 0:
+                            color_two = 3
+                        elif color_two > 3:
+                            color_two = 0
+                    elif event.key == pygame.K_RIGHT:
+                        color_two += 1
+                        if color_two < 0:
+                            color_two = 3
+                        elif color_two > 3:
+                            color_two = 0
+                        if color_two == color_one:
+                            color_two += 1
+                        if color_two < 0:
+                            color_two = 3
+                        elif color_two > 3:
+                            color_two = 0
+            self.color_one = colors[color_one]
+            self.color_two = colors[color_two]
+            self.window.blit(pygame.image.load(
+                f"images{os.sep}player_{colors[color_one]}{os.sep}player_{colors[color_one]}_up.png").convert_alpha(), (200, 200))
+            self.window.blit(pygame.image.load(
+                f"images{os.sep}player_{colors[color_two]}{os.sep}player_{colors[color_two]}_up.png").convert_alpha(), (600, 200))
+            self.window.blit(pygame.font.SysFont(
+                "Arial, Helvetica, sans-serif", 40).render("Farbwahl", False, (0, 0, 255)), (320, 70))
+            self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
+                                                 20).render(colors[color_one], False, (0, 0, 0)), (200, 230))
+            self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
+                                                 20).render(colors[color_two], False, (0, 0, 0)), (600, 230))
+            pygame.display.update()
+            self.clock.tick(60)
 
     def result_screen(self, player: int) -> None:
         """The result screen. Shows who has won.
@@ -236,7 +352,7 @@ class Game:
 class Player(pygame.sprite.Sprite):
     """The player base class."""
 
-    def __init__(self, x: int, y: int, speed: int, firerate: int, images: list) -> None:
+    def __init__(self, x: int, y: int, speed: int, firerate: int, color: str) -> None:
         """Initializes the player.
 
         Arguments:
@@ -244,13 +360,14 @@ class Player(pygame.sprite.Sprite):
             y: the y coordinate.
             speed: the speed of the player.
             firerate: the firerate of the player.
-            images: the images needed to draw the player.
+            color: the color of the player.
 
         Returns:
             Nothing.
         """
         pygame.sprite.Sprite.__init__(self)
-        self.images = images
+        self.images = [pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_up.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_left.png").convert_alpha(
+        ), pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_down.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_right.png").convert_alpha()]
         self.rect = self.images[0].get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -329,26 +446,26 @@ class Player(pygame.sprite.Sprite):
         window.blit(self.images[self.direction], (self.rect.x, self.rect.y))
 
 
-class Player_Blue(Player):
-    """Class for the blue player. Inherits from the player class."""
+class Player_One(Player):
+    """Class for the first player. Inherits from the player class."""
 
-    def __init__(self, x: int, y: int, speed: int, firerate: int) -> None:
-        """Initializes the blue player. Calls the inherited function.
+    def __init__(self, x: int, y: int, speed: int, firerate: int, color: str) -> None:
+        """Initializes the first player. Calls the inherited function.
 
         Arguments:
             x: the x coordinate.
             y: the y coordinate.
             speed: the speed of the player.
             firerate: the firerate of the player.
+            color: the color of the player.
 
         Returns:
             Nothing.
         """
-        super().__init__(x, y, speed, firerate, [pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_up.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_left.png").convert_alpha(
-        ), pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_down.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_blue{os.sep}player_blue_right.png").convert_alpha()])
+        super().__init__(x, y, speed, firerate, color)
 
     def move(self, entities: list, HEIGHT: int, WIDTH: int) -> None:
-        """Moves the blue player based on user input. Calls the inherited function.
+        """Moves the first player based on user input. Calls the inherited function.
 
         Arguments:
             entities: all the entities in the game.
@@ -372,26 +489,26 @@ class Player_Blue(Player):
         return super().attack(bullets, ord("f"))
 
 
-class Player_Yellow(Player):
-    """Class for the yellow player. Inherits from the player class."""
+class Player_Two(Player):
+    """Class for the first player. Inherits from the player class."""
 
-    def __init__(self, x: int, y: int, speed: int, firerate: int) -> None:
-        """Initializes the yellow player. Calls the inherited function.
+    def __init__(self, x: int, y: int, speed: int, firerate: int, color: str) -> None:
+        """Initializes the first player. Calls the inherited function.
 
         Arguments:
             x: the x coordinate.
             y: the y coordinate.
             speed: the speed of the player.
             firerate: the firerate of the player.
+            color: the color of the player.
 
         Returns:
             Nothing.
         """
-        super().__init__(x, y, speed, firerate, [pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_up.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_left.png").convert_alpha(
-        ), pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_down.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_yellow{os.sep}player_yellow_right.png").convert_alpha()])
+        super().__init__(x, y, speed, firerate, color)
 
     def move(self, entities: list, HEIGHT: int, WIDTH: int) -> None:
-        """Moves the yellow player based on user input. Calls the inherited function.
+        """Moves the first player based on user input. Calls the inherited function.
 
         Arguments:
             entities: all the entities in the game.
@@ -458,7 +575,7 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = direction
         pygame.mixer.Sound(f"sound{os.sep}shot_sound.wav").play()
 
-    def move(self, bullets: list, walls: list, player_one: Player_Blue, player_two: Player_Yellow, HEIGHT: int, WIDTH: int, window: pygame.Surface) -> typing.Union[None, int]:
+    def move(self, bullets: list, walls: list, player_one: Player_One, player_two: Player_Two, HEIGHT: int, WIDTH: int, window: pygame.Surface) -> typing.Union[None, int]:
         """Moves the bullet.
 
         Arguments:
