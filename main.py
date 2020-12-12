@@ -1,3 +1,4 @@
+import enum
 import json
 import os
 import typing
@@ -30,8 +31,8 @@ class Game:
         self.debug = False
         self.invulnerable = False
         self.debug = False
-        self.color_one = "blue"
-        self.color_two = "yellow"
+        self.color_one = Color.blue
+        self.color_two = Color.yellow
         with open("config.json", "r") as f:
             self.config = json.load(f)
         pygame.display.set_caption("Tanks2")
@@ -178,10 +179,7 @@ class Game:
         Returns:
             Nothing.
         """
-        colors = ["blue", "yellow", "green", "red"]
         options = True
-        color_one = 0
-        color_two = 1
         while options:
             self.window.fill((190, 190, 190))
             for event in pygame.event.get():
@@ -192,65 +190,31 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         options = False
                     if event.key == pygame.K_a:
-                        color_one -= 1
-                        if color_one < 0:
-                            color_one = 3
-                        elif color_one > 3:
-                            color_one = 0
-                        if color_one == color_two:
-                            color_one -= 1
-                        if color_one < 0:
-                            color_one = 3
-                        elif color_one > 3:
-                            color_one = 0
+                        self.color_one = self.color_one.previous()
+                        if self.color_one == self.color_two:
+                            self.color_one = self.color_one.previous()
                     elif event.key == pygame.K_d:
-                        color_one += 1
-                        if color_one < 0:
-                            color_one = 3
-                        elif color_one > 3:
-                            color_one = 0
-                        if color_one == color_two:
-                            color_one += 1
-                        if color_one < 0:
-                            color_one = 3
-                        elif color_one > 3:
-                            color_one = 0
+                        self.color_one = self.color_one.next()
+                        if self.color_one == self.color_two:
+                            self.color_one = self.color_one.next()
                     if event.key == pygame.K_LEFT:
-                        color_two -= 1
-                        if color_two < 0:
-                            color_two = 3
-                        elif color_two > 3:
-                            color_two = 0
-                        if color_two == color_one:
-                            color_two -= 1
-                        if color_two < 0:
-                            color_two = 3
-                        elif color_two > 3:
-                            color_two = 0
+                        self.color_two = self.color_two.previous()
+                        if self.color_two == self.color_one:
+                            self.color_two = self.color_two.previous()
                     elif event.key == pygame.K_RIGHT:
-                        color_two += 1
-                        if color_two < 0:
-                            color_two = 3
-                        elif color_two > 3:
-                            color_two = 0
-                        if color_two == color_one:
-                            color_two += 1
-                        if color_two < 0:
-                            color_two = 3
-                        elif color_two > 3:
-                            color_two = 0
-            self.color_one = colors[color_one]
-            self.color_two = colors[color_two]
+                        self.color_two = self.color_two.next()
+                        if self.color_two == self.color_one:
+                            self.color_two = self.color_two.next()
             self.window.blit(pygame.image.load(
-                f"images{os.sep}player_{colors[color_one]}{os.sep}player_{colors[color_one]}_up.png").convert_alpha(), (200, 200))
+                f"images{os.sep}player_{str(self.color_one)}{os.sep}player_{str(self.color_one)}_up.png").convert_alpha(), (200, 200))
             self.window.blit(pygame.image.load(
-                f"images{os.sep}player_{colors[color_two]}{os.sep}player_{colors[color_two]}_up.png").convert_alpha(), (600, 200))
+                f"images{os.sep}player_{str(self.color_two)}{os.sep}player_{str(self.color_two)}_up.png").convert_alpha(), (600, 200))
             self.window.blit(pygame.font.SysFont(
                 "Arial, Helvetica, sans-serif", 40).render("Farbwahl", False, (0, 0, 255)), (320, 70))
             self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                 20).render(colors[color_one], False, (0, 0, 0)), (200, 230))
+                                                 20).render(str(self.color_one), False, (0, 0, 0)), (200, 230))
             self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif",
-                                                 20).render(colors[color_two], False, (0, 0, 0)), (600, 230))
+                                                 20).render(str(self.color_two), False, (0, 0, 0)), (600, 230))
             pygame.display.update()
             self.clock.tick(60)
 
@@ -366,8 +330,8 @@ class Player(pygame.sprite.Sprite):
             Nothing.
         """
         pygame.sprite.Sprite.__init__(self)
-        self.images = [pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_up.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_left.png").convert_alpha(
-        ), pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_down.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_{color}{os.sep}player_{color}_right.png").convert_alpha()]
+        self.images = [pygame.image.load(f"images{os.sep}player_{str(color)}{os.sep}player_{str(color)}_up.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_{str(color)}{os.sep}player_{str(color)}_left.png").convert_alpha(
+        ), pygame.image.load(f"images{os.sep}player_{str(color)}{os.sep}player_{str(color)}_down.png").convert_alpha(), pygame.image.load(f"images{os.sep}player_{str(color)}{os.sep}player_{str(color)}_right.png").convert_alpha()]
         self.rect = self.images[0].get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -660,6 +624,44 @@ class Wall(pygame.sprite.Sprite):
             Nothing.
         """
         window.blit(self.image, (self.rect.x, self.rect.y))
+
+
+class Color(enum.IntEnum):
+    """The class for the colors."""
+    blue = enum.auto()
+    yellow = enum.auto()
+    green = enum.auto()
+    red = enum.auto()
+
+    def __str__(self) -> str:
+        """Returns string representation.
+
+        Returns:
+            The name of the color.
+        """
+        return self.name
+
+    def next(self) -> enum.IntEnum:
+        """Go to next color.
+
+        Returns:
+            The next color.
+        """
+        x = self.value + 1
+        if x > len(Color):
+            x = 1
+        return Color(x)
+
+    def previous(self) -> enum.IntEnum:
+        """Go to previous color.
+
+        Returns:
+            The previous color.
+        """
+        x = self.value - 1
+        if x < 1:
+            x = len(Color)
+        return Color(x)
 
 
 Game().splash_screen()
