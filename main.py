@@ -50,10 +50,10 @@ class Game:
             self.credit_screen()
         with open(f"levels{os.sep}level_{self.level_number}.json", "r") as f:
             level = json.load(f)
-        self.player_one = Player_One(level["spawn_one"][0], level["spawn_one"]
-                                     [1], self.config["speed"], self.config["firerate"], self.color_one)
-        self.player_two = Player_Two(level["spawn_two"][0], level["spawn_two"]
-                                     [1], self.config["speed"], self.config["firerate"], self.color_two)
+        self.player_one = Player(level["spawn_one"][0], level["spawn_one"][1], self.config["speed"],
+                                 self.config["firerate"], self.color_one, ord("a"), ord("d"), ord("w"), ord("s"), ord("f"))
+        self.player_two = Player(level["spawn_two"][0], level["spawn_two"][1], self.config["speed"], self.config["firerate"],
+                                 self.color_two, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN, ord("l"))
         self.entities = []
         self.walls = []
         self.bullets = []
@@ -314,9 +314,9 @@ class Game:
 
 
 class Player(pygame.sprite.Sprite):
-    """The player base class."""
+    """The player class."""
 
-    def __init__(self, x: int, y: int, speed: int, firerate: int, color: str) -> None:
+    def __init__(self, x: int, y: int, speed: int, firerate: int, color: str, left: int, right: int, up: int, down: int, fire: int) -> None:
         """Initializes the player.
 
         Arguments:
@@ -325,6 +325,11 @@ class Player(pygame.sprite.Sprite):
             speed: the speed of the player.
             firerate: the firerate of the player.
             color: the color of the player.
+            left: the key for left.
+            right: the key for right.
+            up: the key for up.
+            down: the key for down.
+            fire: the key for firing.
 
         Returns:
             Nothing.
@@ -339,8 +344,13 @@ class Player(pygame.sprite.Sprite):
         self.direction = 0
         self.firerate = firerate
         self.fire = 0
+        self.left = left
+        self.right = right
+        self.up = up
+        self.down = down
+        self.fire_key = fire
 
-    def move(self, entities: list, HEIGHT: int, WIDTH: int, left: int, right: int, up: int, down: int) -> None:
+    def move(self, entities: list, HEIGHT: int, WIDTH: int,) -> None:
         """Moves the player based on user input.
 
         Arguments:
@@ -356,39 +366,38 @@ class Player(pygame.sprite.Sprite):
             Nothing.
         """
         keys = pygame.key.get_pressed()
-        if keys[up]:
+        if keys[self.up]:
             self.direction = 0
             self.rect.y -= self.speed
             if any(self.rect.colliderect(entity.rect) for entity in entities if entity != self) or self.rect.y <= 0:
                 self.rect.y += self.speed
-        elif keys[left]:
+        elif keys[self.left]:
             self.direction = 1
             self.rect.x -= self.speed
             if any(self.rect.colliderect(entity.rect) for entity in entities if entity != self) or self.rect.x <= 0:
                 self.rect.x += self.speed
-        elif keys[down]:
+        elif keys[self.down]:
             self.direction = 2
             self.rect.y += self.speed
             if any(self.rect.colliderect(entity.rect) for entity in entities if entity != self) or self.rect.y >= (HEIGHT - 32):
                 self.rect.y -= self.speed
-        elif keys[right]:
+        elif keys[self.right]:
             self.direction = 3
             self.rect.x += self.speed
             if any(self.rect.colliderect(entity.rect) for entity in entities if entity != self) or self.rect.x >= (WIDTH - 32):
                 self.rect.x -= self.speed
 
-    def attack(self, bullets: list, fire: int) -> None:
+    def attack(self, bullets: list) -> None:
         """Shoots bullets based on user input.
 
         Arguments:
             bullets: all bullets in the game.
-            fire: counts down to regulate firerate.
 
         Returns:
             Nothing.
         """
         keys = pygame.key.get_pressed()
-        if keys[fire]:
+        if keys[self.fire_key]:
             if self.fire == 0:
                 self.fire = self.firerate
                 bullets.append(
@@ -408,93 +417,6 @@ class Player(pygame.sprite.Sprite):
             Nothing.
         """
         window.blit(self.images[self.direction], (self.rect.x, self.rect.y))
-
-
-class Player_One(Player):
-    """Class for the first player. Inherits from the player class."""
-
-    def __init__(self, x: int, y: int, speed: int, firerate: int, color: str) -> None:
-        """Initializes the first player. Calls the inherited function.
-
-        Arguments:
-            x: the x coordinate.
-            y: the y coordinate.
-            speed: the speed of the player.
-            firerate: the firerate of the player.
-            color: the color of the player.
-
-        Returns:
-            Nothing.
-        """
-        super().__init__(x, y, speed, firerate, color)
-
-    def move(self, entities: list, HEIGHT: int, WIDTH: int) -> None:
-        """Moves the first player based on user input. Calls the inherited function.
-
-        Arguments:
-            entities: all the entities in the game.
-            HEIGHT: the height of the game window.
-            WIDTH: the width of the game window.
-
-        Returns:
-            Nothing.
-        """
-        super().move(entities, HEIGHT, WIDTH, ord("a"), ord("d"), ord("w"), ord("s"))
-
-    def attack(self, bullets: list) -> None:
-        """Shoots bullets based on user input. Calls the inherited function.
-
-        Arguments:
-            bulles: a list of all bullets in the game.
-
-        Returns:
-            Nothing.
-        """
-        return super().attack(bullets, ord("f"))
-
-
-class Player_Two(Player):
-    """Class for the first player. Inherits from the player class."""
-
-    def __init__(self, x: int, y: int, speed: int, firerate: int, color: str) -> None:
-        """Initializes the first player. Calls the inherited function.
-
-        Arguments:
-            x: the x coordinate.
-            y: the y coordinate.
-            speed: the speed of the player.
-            firerate: the firerate of the player.
-            color: the color of the player.
-
-        Returns:
-            Nothing.
-        """
-        super().__init__(x, y, speed, firerate, color)
-
-    def move(self, entities: list, HEIGHT: int, WIDTH: int) -> None:
-        """Moves the first player based on user input. Calls the inherited function.
-
-        Arguments:
-            entities: all the entities in the game.
-            HEIGHT: the height of the game window.
-            WIDTH: the width of the game window.
-
-        Returns:
-            Nothing.
-        """
-        super().move(entities, HEIGHT, WIDTH, pygame.K_LEFT,
-                     pygame.K_RIGHT, pygame.K_UP, pygame.K_DOWN)
-
-    def attack(self, bullets: list) -> None:
-        """Shoots bullets based on user input. Calls the inherited function.
-
-        Arguments:
-            bulles: a list of all bullets in the game.
-
-        Returns:
-            Nothing.
-        """
-        return super().attack(bullets, ord("l"))
 
 
 class Bullet(pygame.sprite.Sprite):
@@ -539,7 +461,7 @@ class Bullet(pygame.sprite.Sprite):
         self.direction = direction
         pygame.mixer.Sound(f"sound{os.sep}shot_sound.wav").play()
 
-    def move(self, bullets: list, walls: list, player_one: Player_One, player_two: Player_Two, HEIGHT: int, WIDTH: int, window: pygame.Surface) -> typing.Union[None, int]:
+    def move(self, bullets: list, walls: list, player_one: Player, player_two: Player, HEIGHT: int, WIDTH: int, window: pygame.Surface) -> typing.Union[None, int]:
         """Moves the bullet.
 
         Arguments:
