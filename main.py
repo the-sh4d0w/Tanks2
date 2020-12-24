@@ -83,16 +83,14 @@ class Game:
                     pygame.quit()
                     quit()
                 elif event.type == pygame.KEYDOWN:
-                    pass
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_F3]:
-                self.debug = not self.debug
-            elif keys[pygame.K_F2]:
-                dead = 2
-            elif keys[pygame.K_F1]:
-                dead = 1
-            elif keys[pygame.K_ESCAPE]:
-                return
+                    if event.key == pygame.K_ESCAPE:
+                        return
+                    elif event.key == pygame.K_F3:
+                        self.debug = not self.debug
+                    elif event.key == pygame.K_F2:
+                        dead = 2
+                    elif event.key == pygame.K_F1:
+                        dead = 1
             self.entities = [self.player_one, self.player_two] + self.walls
             self.player_one.move(self.entities, self.HEIGHT, self.WIDTH)
             self.player_one.attack(self.bullets)
@@ -150,6 +148,9 @@ class Game:
                     elif event.key == pygame.K_RETURN:
                         if selected == Menu.Start:
                             self.game_loop()
+                            pygame.mixer.music.load(
+                                f"sound{os.sep}menu_song.wav")
+                            pygame.mixer.music.play(-1)
                         elif selected == Menu.Farbwahl:
                             self.color_choosing_screen()
                         elif selected == Menu.Optionen:
