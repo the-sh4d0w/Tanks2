@@ -27,12 +27,13 @@ class Game:
         self.bullets = []
         self.walls = []
         self.entities = []
-        self.level_number = 1
+        self.level_number = 6
         self.debug = False
         self.invulnerable = False
         self.debug = False
         self.color_one = Color.blue
         self.color_two = Color.yellow
+        self.volume = 1.0
         with open("config.json", "r") as f:
             self.config = json.load(f)
         pygame.display.set_caption("Tanks2")
@@ -45,9 +46,6 @@ class Game:
         Returns:
             Nothing.
         """
-        if not os.path.isfile(f"levels{os.sep}level_{self.level_number}.json"):
-            self.level_number = 1
-            self.credit_screen()
         with open(f"levels{os.sep}level_{self.level_number}.json", "r") as f:
             level = json.load(f)
         self.player_one = Player(level["spawn_one"][0], level["spawn_one"][1], self.config["speed"],
@@ -70,11 +68,15 @@ class Game:
         Returns:
             Nothing.
         """
+        if not os.path.isfile(f"levels{os.sep}level_{self.level_number}.json"):
+            self.level_number = 1
+            return
         self.load_level()
         dead = False
         pygame.mixer.music.load(f"sound{os.sep}background_song.wav")
+        pygame.mixer.music.set_volume(self.volume)
         pygame.mixer.music.play(-1)
-        while True:
+        while not dead:
             self.window.fill((190, 190, 190))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -86,11 +88,11 @@ class Game:
             if keys[pygame.K_F3]:
                 self.debug = not self.debug
             elif keys[pygame.K_F2]:
-                self.result_screen(2)
+                dead = 2
             elif keys[pygame.K_F1]:
-                self.result_screen(1)
+                dead = 1
             elif keys[pygame.K_ESCAPE]:
-                self.menu_screen()
+                return
             self.entities = [self.player_one, self.player_two] + self.walls
             self.player_one.move(self.entities, self.HEIGHT, self.WIDTH)
             self.player_one.attack(self.bullets)
@@ -102,8 +104,6 @@ class Game:
                 dead = bullet.move(self.bullets, self.walls, self.player_one,
                                    self.player_two, self.HEIGHT, self.WIDTH, self.window)
                 bullet.update(self.window)
-                if dead:
-                    self.result_screen(dead)
             for wall in self.walls:
                 wall.update(self.window)
             if self.debug:
@@ -123,6 +123,8 @@ class Game:
                         bullet.rect.x, bullet.rect.y, bullet.rect.width, bullet.rect.height), 1)
             pygame.display.update()
             self.clock.tick(self.config["fps"])
+        self.result_screen(dead)
+        self.game_loop()
 
     def menu_screen(self) -> None:
         """The menu screen. Allows either starting the game or quitting it.
@@ -130,13 +132,11 @@ class Game:
         Returns:
             Nothing.
         """
-        text = [["Start", (380, 150)], ["Farbwahl", (380, 200)], [
-            "Beenden", (380, 250)]]
-        menu = True
-        selected = 0
+        selected = Menu.Start
         pygame.mixer.music.load(f"sound{os.sep}menu_song.wav")
+        pygame.mixer.music.set_volume(self.volume)
         pygame.mixer.music.play(-1)
-        while menu:
+        while True:
             self.window.fill((190, 190, 190))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -144,37 +144,38 @@ class Game:
                     quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        selected -= 1
+                        selected = selected.previous()
                     elif event.key == pygame.K_DOWN:
-                        selected += 1
+                        selected = selected.next()
                     elif event.key == pygame.K_RETURN:
-                        if selected == 0:
-                            menu = False
-                        elif selected == 1:
+                        if selected == Menu.Start:
+                            self.game_loop()
+                        elif selected == Menu.Farbwahl:
+                            self.color_choosing_screen()
+                        elif selected == Menu.Optionen:
                             self.options_screen()
-                        elif selected == 2:
+                        elif selected == Menu.Credits:
+                            self.credit_screen()
+                        elif selected == Menu.Beenden:
                             pygame.quit()
                             quit()
-                    if selected > 2:
-                        selected = 0
-                    elif selected < 0:
-                        selected = 2
             self.window.blit(pygame.font.SysFont(
-                "Arial, Helvetica, sans-serif", 40).render("Tanks 2", False, (0, 0, 255)), (360, 70))
-            for i in range(0, 3):
-                if i != selected:
-                    color = (0, 0, 0)
-                else:
+                "Arial, Helvetica, sans-serif", 80).render("Tanks 2", False, (0, 0, 255)), (300, 10))
+            x = 380
+            y = 120
+            for menu_item in Menu:
+                if menu_item == selected:
                     color = (0, 0, 255)
+                else:
+                    color = (0, 0, 0)
                 self.window.blit(pygame.font.SysFont(
-                    "Arial, Helvetica, sans-serif", 20).render(text[i][0], False, color), text[i][1])
+                    "Arial, Helvetica, sans-serif", 20).render(str(menu_item), False, color), (x, y))
+                y += 50
             pygame.display.update()
             self.clock.tick(60)
-        pygame.mixer.music.stop()
-        self.game_loop()
 
-    def options_screen(self) -> None:
-        """The options screen. Lets players choose their color.
+    def color_choosing_screen(self) -> None:
+        """The color choosing screen. Lets players choose their color.
 
         Returns:
             Nothing.
@@ -218,6 +219,39 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
 
+    def options_screen(self) -> None:
+        """The options screen. For configuring sound.
+
+        Returns:
+            Nothing.
+        """
+        options = True
+        while options:
+            self.window.fill((190, 190, 190))
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        options = False
+                    if event.key == pygame.K_UP:
+                        self.volume += 0.01
+                        if self.volume > 1.0:
+                            self.volume = 1.0
+                        pygame.mixer.music.set_volume(self.volume)
+                    elif event.key == pygame.K_DOWN:
+                        if self.volume < 0.0:
+                            self.volume = 0.0
+                        self.volume -= 0.01
+                        pygame.mixer.music.set_volume(self.volume)
+            self.window.blit(pygame.font.SysFont(
+                "Arial, Helvetica, sans-serif", 80).render("Optionen", False, (0, 0, 255)), (300, 10))
+            self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
+                f"Lautstärke: {int(self.volume * 100)}%", False, (0, 0, 255)), (380, 120))
+            pygame.display.update()
+            self.clock.tick(60)
+
     def result_screen(self, player: int) -> None:
         """The result screen. Shows who has won.
 
@@ -231,6 +265,7 @@ class Game:
         winner = True
         ok = True
         pygame.mixer.music.load(f"sound{os.sep}winner_song.wav")
+        pygame.mixer.music.set_volume(self.volume)
         pygame.mixer.music.play(-1)
         while winner:
             self.window.fill((190, 190, 190))
@@ -264,7 +299,6 @@ class Game:
             pygame.display.update()
             self.clock.tick(60)
         pygame.mixer.music.stop()
-        self.game_loop()
 
     def splash_screen(self) -> None:
         """The splash screen. Shows the game studio logo.
@@ -276,7 +310,6 @@ class Game:
             f"images{os.sep}Evil Panda Studios Logo.png").convert(), (self.WIDTH, self.HEIGHT)), (0, 0))
         pygame.display.update()
         pygame.time.wait(3000)
-        self.menu_screen()
 
     def credit_screen(self) -> None:
         """The credit screen. Shows who worked on the game.
@@ -307,10 +340,12 @@ class Game:
             "Produzent 1            Benjamin", False, (255, 255, 255)), (500, 250))
         self.window.blit(pygame.font.SysFont("Arial, Helvetica, sans-serif", 20).render(
             "Produzent 2            Niklas", False, (255, 255, 255)), (500, 300))
-
         pygame.display.update()
-        pygame.time.wait(7000)
-        self.menu_screen()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        return
 
 
 class Player(pygame.sprite.Sprite):
@@ -586,4 +621,44 @@ class Color(enum.IntEnum):
         return Color(x)
 
 
+class Menu(enum.IntEnum):
+    """The class for the menu."""
+    Start = enum.auto()
+    Farbwahl = enum.auto()
+    Optionen = enum.auto()
+    Credits = enum.auto()
+    Beenden = enum.auto()
+
+    def __str__(self) -> str:
+        """Returns string representation.
+
+        Returns:
+            The name of the menu item.
+        """
+        return self.name
+
+    def next(self) -> enum.IntEnum:
+        """Go to next menu item.
+
+        Returns:
+            The next menu item.
+        """
+        x = self.value + 1
+        if x > len(Menu):
+            x = 1
+        return Menu(x)
+
+    def previous(self) -> enum.IntEnum:
+        """Go to previous menu item.
+
+        Returns:
+            The previous menu item.
+        """
+        x = self.value - 1
+        if x < 1:
+            x = len(Menu)
+        return Menu(x)
+
+
 Game().splash_screen()
+Game().menu_screen()
